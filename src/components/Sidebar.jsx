@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { admassets } from '../assets/assetsAdm'
+import { admassets } from '../assets/user/assetsAdm'
 
 const Sidebar = () => {
   return (

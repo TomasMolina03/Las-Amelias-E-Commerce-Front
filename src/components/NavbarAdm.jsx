@@ -1,5 +1,5 @@
 import React from 'react'
-import {admassets} from '../assets/assetsAdm'
+import {admassets} from '../assets/user/assetsAdm'
 
 const NavbarAdm = () => {
   return (

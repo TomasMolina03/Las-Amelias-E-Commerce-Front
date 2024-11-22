@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { admassets } from '../assets/assetsAdm'
+import { admassets } from '../assets/user/assetsAdm'
 import axios from 'axios'
 
 const Add = () => {

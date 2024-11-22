@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import Add from '../pages/Add'
-import List from '../pages/List'
-import NavbarAdm from './NavbarAdm'
-import OrdersAdm from '../pages/OrdersAdm'
-import Sidebar from './Sidebar'
+import Add from './Add'
+import List from './List'
+import NavbarAdm from '../components/NavbarAdm'
+import OrdersAdm from './OrdersAdm'
+import Sidebar from '../components/Sidebar'
 
 
 const PanelAdm = () => {

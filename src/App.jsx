@@ -14,6 +14,7 @@ import Footer from "./components/Footer";
 import SearchBox from "./components/SearchBox";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import PanelAdm from "./pages/PanelAdm";
 
 
 
@@ -34,7 +35,7 @@ const App = () => {
         <Route path='/login' element={<Login/>} />
         <Route path='/place-order' element={<PlaceOrder/>} />
         <Route path='/orders' element={<Orders/>} />
-
+        <Route path='/panelAdm' element={<PanelAdm/>} />
       </Routes>
       <Footer />
     </div>
