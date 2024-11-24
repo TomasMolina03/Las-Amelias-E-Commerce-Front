@@ -111,6 +111,7 @@ const value = {
     updateQuantity,
     getCartAmount,
     navigate,
+    setCartItems
 };
 
 return (

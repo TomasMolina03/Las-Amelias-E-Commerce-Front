@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Add from './Add'
 import List from './List'
-import NavbarAdm from '../components/NavbarAdm'
 import OrdersAdm from './OrdersAdm'
 import Sidebar from '../components/Sidebar'
 import Login from './Login'
@@ -16,7 +15,6 @@ const PanelAdm = () => {
         { token === ''
           ? <Login />
           : <>
-            <NavbarAdm />
             <hr />
             <div className='flex w-full'>
               <Sidebar />
