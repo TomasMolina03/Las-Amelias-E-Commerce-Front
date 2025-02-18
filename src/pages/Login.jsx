@@ -8,7 +8,6 @@ const Login = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Verificar si ya hay un usuario autenticado en localStorage
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       setIsLoggedIn(true);
@@ -49,7 +48,7 @@ const Login = () => {
           address,
           mobileNumber,
           surname,
-          role: 'user', // Asignar rol por defecto
+          role: 'user',
         });
         toast.success("Cuenta creada exitosamente. Inicie sesión para comprar.");
         document.getElementById('formRegister').reset();
@@ -61,33 +60,32 @@ const Login = () => {
 
   const login = async (e) => {
     e.preventDefault();
-  
+
     const email = document.getElementById('emailRegister').value;
     const password = document.getElementById('passwordRegister').value;
-  
     try {
-      const response = await axios.get('http://localhost:4000/users');
-      const users = response.data;
-      const userValid = users.find(user => user.email === email && user.password === password);
-  
-      if (!userValid) {
-        toast.error("Email y/o contraseña incorrectos!");
-      } else {
-        // Guardar en sessionStorage
-        sessionStorage.setItem('user', JSON.stringify(userValid));
-  
-        toast.success("Inicio de sesión exitoso");
-        // Redirigir según el rol del usuario
-        if (userValid.role === "admin") {
-          window.location.pathname = '/panelAdm/*';
+        const response = await axios.post('http://localhost:4000/users/login', { email, password });
+        if (response.data.user) {
+            const userValid = response.data.user;
+            const token = response.data.token;
+
+            localStorage.setItem('user', JSON.stringify(userValid));
+            localStorage.setItem('token', token);
+
+            toast.success("Inicio de sesión exitoso");
+
+            if (userValid.role === "admin") {
+                window.location.pathname = '/panelAdm/*';
+            } else {
+                window.location.pathname = '/';
+            }
         } else {
-          window.location.pathname = '/';
+            toast.error("Email y/o contraseña incorrectos!");
         }
-      }
     } catch (error) {
-      toast.error("Error al iniciar sesión.");
+        toast.error("Error al iniciar sesión.");
     }
-  };
+};
   
   const handleLogout = () => {
     sessionStorage.removeItem('user'); // Eliminar usuario de sessionStorage
