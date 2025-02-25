@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { jwtDecode } from 'jwt-decode';
 
 const Profile = () => {
   const [userData, setUserData] = useState({
@@ -14,9 +15,26 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    const user = JSON.parse(sessionStorage.getItem('user'));
-    if (user) {
-      setUserData(user);
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUserData({
+          name: decoded.name || '',
+          surname: decoded.surname || '',
+          mobileNumber: decoded.mobileNumber || '',
+          address: decoded.address || '',
+          email: decoded.email || '',
+          password: ''
+        });
+      } catch (error) {
+        console.error('Error decoding token: ', error);
+        localStorage.removeItem('token');
+        window.location.pathname = '/login';
+      }
+    } else {
+      window.location.pathname = '/login';
     }
   }, []);
 
@@ -30,13 +48,22 @@ const Profile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const userId = userData._id;
+    const token = localStorage.getItem('token');
+    const decoded = jwtDecode(token);
+    const userId = decoded.id;
 
     try {
-      const response = await axios.put(`http://localhost:4000/users/${userId}`, userData);
+      const response = await axios.put(
+        `http://localhost:4000/users/${userId}`
+        , userData,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
       if (response.status === 200) {
         toast.success('Datos actualizados exitosamente');
-        sessionStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('token', response.data.newToken);
       }
     } catch (error) {
       toast.error('Error al actualizar los datos');
@@ -44,12 +71,18 @@ const Profile = () => {
   };
 
   const handleDeleteAccount = async () => {
-    const userId = userData._id;
+    const token = localStorage.getItem('token');
+    const decoded = jwtDecode(token);
+    const userId = decoded.id;
     const confirmDelete = window.confirm('¿Estás seguro de que quieres eliminar tu cuenta?');
     if (confirmDelete) {
       try {
-        await axios.delete(`http://localhost:4000/users/${userId}`);
-        sessionStorage.removeItem('user');
+        await axios.delete(`http://localhost:4000/users/${userId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        localStorage.removeItem('token');
         window.location.pathname = '/';
         toast.success('Cuenta eliminada exitosamente');
       } catch (error) {

@@ -2,30 +2,40 @@ import { useContext, useState, useEffect } from 'react';
 import { assets } from '../assets/user/assets';
 import { Link, NavLink } from 'react-router-dom';
 import { ShopContext } from '../context/ShopContext';
+import { jwtDecode } from 'jwt-decode';
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userId, setUserId] = useState(null); // Estado para almacenar el ID del usuario
+  const [userId, setUserId] = useState(null);
   const { setShowSearch, getCartCount } = useContext(ShopContext);
 
-  // Verificar si el usuario está logueado y obtener el ID desde sessionStorage
   useEffect(() => {
-    const user = JSON.parse(sessionStorage.getItem('user'));
-    if (user) {
-      setIsLoggedIn(true);
-      setUserId(user._id); // Guardar el ID del usuario en el estado
+    const token = localStorage.getItem('token');
+
+    if(token) {
+      try {
+        const decoded = jwtDecode(token);
+        setIsLoggedIn(true);
+        setUserId(decoded.id);
+      } catch (error) {
+        console.error('Error decoding token: ', error);
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        setUserId(null);
+      }
     } else {
       setIsLoggedIn(false);
       setUserId(null);
     }
   }, []);
 
-  // Función para cerrar sesión
   const handleLogout = () => {
-    sessionStorage.removeItem('user'); // Eliminar usuario de sessionStorage
-    setIsLoggedIn(false); // Actualizar estado local
-    setUserId(null); // Limpiar el ID del usuario
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    setUserId(null);
+    window.location.reload();
+    window.location.pathname = '/';
   };
 
   return (

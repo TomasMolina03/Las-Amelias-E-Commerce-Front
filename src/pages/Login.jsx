@@ -2,15 +2,24 @@ import { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 const Login = () => {
   const [currentState, setCurrentState] = useState('Registrarse');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      setIsLoggedIn(true);
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error('Error decoded token:', error);
+        setIsLoggedIn(false);
+        localStorage.removeItem('token');
+      }
     }
   }, []);
 
@@ -54,7 +63,7 @@ const Login = () => {
         document.getElementById('formRegister').reset();
       }
     } catch (error) {
-      toast.error("Error al crear la cuenta.");
+      toast.error("Error al crear la cuenta: ", error);
     }
   };
 
@@ -65,16 +74,15 @@ const Login = () => {
     const password = document.getElementById('passwordRegister').value;
     try {
         const response = await axios.post('http://localhost:4000/users/login', { email, password });
-        if (response.data.user) {
-            const userValid = response.data.user;
+        if (response.data.token) {
             const token = response.data.token;
-
-            localStorage.setItem('user', JSON.stringify(userValid));
             localStorage.setItem('token', token);
 
             toast.success("Inicio de sesión exitoso");
+          
+            const decoded = jwtDecode(token);
 
-            if (userValid.role === "admin") {
+            if (decoded.role === "admin") {
                 window.location.pathname = '/panelAdm/*';
             } else {
                 window.location.pathname = '/';
@@ -83,15 +91,15 @@ const Login = () => {
             toast.error("Email y/o contraseña incorrectos!");
         }
     } catch (error) {
-        toast.error("Error al iniciar sesión.");
+        toast.error("Error al iniciar sesión: ", error);
     }
 };
   
-  const handleLogout = () => {
-    sessionStorage.removeItem('user'); // Eliminar usuario de sessionStorage
-    setIsLoggedIn(false); // Actualizar estado local
-    toast.success("Sesión cerrada exitosamente.");
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem('token');
+  //   setIsLoggedIn(false);
+  //   toast.success("Sesión cerrada exitosamente.");
+  // };
 
   return (
     <>
