@@ -45,4 +45,5 @@ const LatestCollection = () => {
     );
 };
 
+
 export default LatestCollection;
